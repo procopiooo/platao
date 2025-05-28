@@ -1,105 +1,145 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Calendário de Plantão</title>
+  <title>Plantões HomeNet</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 20px;
-      background-color: #f3f3f3;
-    }
-
-    #login-container, #calendar-container {
-      max-width: 500px;
+      font-family: 'Courier New', Courier, monospace;
+      max-width: 1000px;
       margin: 0 auto;
+      padding: 20px;
+      background-color: #2196F3;
+    }
+    #login-container {
+      max-width: 300px;
+      margin: 50px auto;
+      padding: 20px;
+      border: 1px solid #dddddd;
+      border-radius: 5px;
+      text-align: center;
+      background-color: white;
+    }
+    #login-container input {
+      width: 100%;
+      padding: 8px;
+      margin: 8px 0;
+      box-sizing: border-box;
       text-align: center;
     }
-
-    input {
-      display: block;
-      margin: 10px auto;
+    #login-button {
+      width: 100%;
       padding: 10px;
-      width: 80%;
-    }
-
-    button {
-      padding: 10px 20px;
-      margin: 10px;
+      margin: 5px 0;
+      color: white;
+      background-color: #051253;
+      border: none;
+      border-radius: 15px;
       cursor: pointer;
     }
-
+    #viewModeToggle {
+      background-color: #051253;
+      border-radius: 15px;
+      color: white;
+      padding: 10px 20px;
+      cursor: pointer;
+      margin-bottom: 15px;
+      border: none;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    #error-message {
+      color: red;
+      margin-top: 10px;
+    }
+    #calendar-container {
+      max-width: 900px;
+      margin: 20px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      display: none;
+    }
     #calendar {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
-      gap: 5px;
-      margin-top: 20px;
+      gap: 10px;
     }
-
     .calendar-day {
-      background-color: #fff;
-      border: 1px solid #ccc;
-      padding: 5px;
-      min-height: 60px;
+      background-color: white;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      border-radius: 8px;
+      padding: 10px;
+      min-height: 100px;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
       align-items: center;
+      justify-content: flex-start;
+      border: none;
     }
-
-    .calendar-day input {
-      width: 90%;
-    }
-
     .calendar-day .day-number {
       font-weight: bold;
+      margin-bottom: 8px;
     }
-
+    .calendar-day input[type="text"] {
+      width: 90%;
+      padding: 5px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      text-align: center;
+      font-family: 'Courier New', Courier, monospace;
+    }
+    .calendar-day span {
+      background-color: #2e2a69;
+      color: #dddddd;
+      padding: 5px;
+      border-radius: 5px;
+      width: 100%;
+      text-align: center;
+      font-size: 0.9em;
+    }
     .header {
-      background-color: #eee;
       font-weight: bold;
-    }
-
-    .hidden {
-      display: none;
-    }
-
-    span {
-      font-size: 14px;
+      text-align: center;
+      padding: 10px 0;
+      color: white;
+      background-color: #051253;
+      border-radius: 8px;
     }
   </style>
 </head>
 <body>
+
   <div id="login-container">
-    <h2>Login</h2>
+    <h2 style="font-family: 'Courier New', Courier, monospace;">Sistema de Plantões</h2>
     <input type="text" id="username" placeholder="Usuário" />
     <input type="password" id="password" placeholder="Senha" />
     <button id="login-button">Entrar</button>
-    <p id="error-message" style="color: red;"></p>
+    <p id="error-message"></p>
   </div>
 
-  <div id="calendar-container" class="hidden">
+  <div id="calendar-container">
     <button id="viewModeToggle">Modo de Visualização</button>
     <div id="calendar"></div>
   </div>
 
   <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
   <script>
-    // Configuração do Firebase (substitua pelos seus dados!)
+    // Configuração do Firebase (substitua pelos seus dados)
     const firebaseConfig = {
       apiKey: "AIzaSyCGkgC1SrNZVFd0nnAauyngTrwUYRzNkkU",
       authDomain: "plantoes-homenet.firebaseapp.com",
       databaseURL: "https://plantoes-homenet-default-rtdb.firebaseio.com",
-    projectId: "plantoes-homenet",
-    storageBucket: "plantoes-homenet.firebasestorage.app",
-    messagingSenderId: "874959051980",
-    appId: "1:874959051980:web:6d9b3e49fd598a5391f669"
-  };
+      projectId: "plantoes-homenet",
+      storageBucket: "plantoes-homenet.appspot.com",
+      messagingSenderId: "874959051980",
+      appId: "1:874959051980:web:6d9b3e49fd598a5391f669"
+    };
 
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
@@ -141,8 +181,19 @@
     });
 
     function showCalendar() {
-      loginContainer.classList.add('hidden');
-      calendarContainer.classList.remove('hidden');
+      loginContainer.style.display = 'none';
+      calendarContainer.style.display = 'block';
+
+      // Cabeçalhos dos dias da semana
+      calendarEl.innerHTML = `
+        <div class="header">Dom</div>
+        <div class="header">Seg</div>
+        <div class="header">Ter</div>
+        <div class="header">Qua</div>
+        <div class="header">Qui</div>
+        <div class="header">Sex</div>
+        <div class="header">Sáb</div>
+      `;
 
       const today = new Date();
       const year = today.getFullYear();
@@ -152,25 +203,15 @@
       const numDays = lastDay.getDate();
       const startDay = firstDay.getDay();
 
-      calendarEl.innerHTML = `
-        <div class="calendar-day header">Dom</div>
-        <div class="calendar-day header">Seg</div>
-        <div class="calendar-day header">Ter</div>
-        <div class="calendar-day header">Qua</div>
-        <div class="calendar-day header">Qui</div>
-        <div class="calendar-day header">Sex</div>
-        <div class="calendar-day header">Sáb</div>
-      `;
-
       for (let i = 0; i < startDay; i++) {
         calendarEl.innerHTML += `<div class="calendar-day"></div>`;
       }
 
       for (let i = 1; i <= numDays; i++) {
-        const date = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+        const date = `${year}-${String(month + 1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
         const nome = plantonistasData[date] || '';
         const content = isLoggedIn && !isViewMode
-          ? `<input type="text" value="${nome}" onchange="saveName('${date}', this.value)">`
+          ? `<input type="text" value="${nome}" onchange="saveName('${date}', this.value)" />`
           : `<span>${nome}</span>`;
 
         calendarEl.innerHTML += `
@@ -207,10 +248,13 @@
       if (localStorage.getItem('isLoggedIn') === 'true') {
         isLoggedIn = true;
         loadSavedDataFromFirebase(showCalendar);
-      } else {
-        loadSavedDataFromFirebase(); // apenas carregar dados se necessário
       }
     });
+
+    // Para a função onchange do input funcionar no HTML injetado
+    window.saveName = saveName;
+
   </script>
+
 </body>
 </html>
